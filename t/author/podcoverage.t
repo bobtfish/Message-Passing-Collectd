@@ -1,6 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use FindBin qw/ $Bin /;
+use lib "$Bin/../lib";
+
+use MockCollectd;
 
 use Pod::Coverage 0.19;
 use Test::Pod::Coverage 1.04;
