@@ -8,6 +8,7 @@ BEGIN {
 }
 
 use constant TYPE_WRITE => 'WRITE';
+use constant TYPE_INIT => 'INIT';
 
 sub plugin_register {}
 
