@@ -214,7 +214,7 @@ The hash of options for the output class. Not required, but almost certainly nee
 =head3 EncoderClass
 
 The name of the class which will act  the Message::Passing encoder. Will be used as-is if prefixed with C<+>,
-otherwise C<Message::Passing::Output::> will be prepended. Optional, defaults to L<JSON|Message::Passing::Filter::Encoder::JSON>.
+otherwise C<Message::Passing::Filter::Encoder::> will be prepended. Optional, defaults to L<JSON|Message::Passing::Filter::Encoder::JSON>.
 
 =head3 EncoderOptions
 
@@ -234,6 +234,11 @@ Validates the config, and initializes the C<$OUTPUT>
 =head2 write
 
 Writes a metric to the output in C<$OUTPUT>.
+
+=head1 BUGS
+
+Never enters the L<AnyEvent> event loop, and therefore may only work reliably with
+(and is only tested with) L<Message::Passing::Output::ZeroMQ>.
 
 =head1 AUTHOR, COPYRIGHT & LICENSE
 

@@ -10,6 +10,7 @@ all_from 'lib/Message/Passing/Collectd.pm';
 license 'perl';
 authority 'GHENRY';
 
+requires 'Message::Passing';
 requires 'JSON';
 requires 'Try::Tiny';
 requires 'String::RewritePrefix';

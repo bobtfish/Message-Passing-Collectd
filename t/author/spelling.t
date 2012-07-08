@@ -4,6 +4,13 @@ use Test::More;
 use Test::Spelling;
 
 add_stopwords(qw(
+    AnyEvent
+    DecoderClass
+    DecoderOptions
+    InputClass
+    InputOptions
+    ReadTimeSlice
+    pre
     adaptors
     EncoderClass
     EncoderOptions

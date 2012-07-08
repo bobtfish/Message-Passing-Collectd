@@ -1,5 +1,8 @@
   - Fix data to be munged into a saner form so that we get the data
     type information, the hostname and other metadata.
+  - Make GAUGE/COUNTER types strings rather than numbers.
+  - Add a sketch for a read plugin, untested / not complete yet!
+  - Fix various documentation bugs.
 
 0.002
   - Fix important error in the SYNOPSIS for configuring outputs.

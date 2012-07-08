@@ -7,6 +7,7 @@ BEGIN {
     $INC{'Collectd.pm'} = 1;
 }
 
+use constant TYPE_READ => 'READ';
 use constant TYPE_WRITE => 'WRITE';
 use constant TYPE_INIT => 'INIT';
 use constant TYPE_CONFIG => 'CONFIG';
