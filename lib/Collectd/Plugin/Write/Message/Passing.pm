@@ -85,11 +85,18 @@ sub init {
 }
 
 sub write {
-    my ($name, $val) = @_;
+    my ($name, $types, $data) = @_;
     # ["load",[{"min":0,"max":100,"name":"shortterm","type":1},{"min":0,"max":100,"name":"midterm","type":1},{"min":0,"max":100,"name":"longterm","type":1}],{"plugin":"load","time":1341655869.22588,"type":"load","values":[0.41,0.13,0.08],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}]
     # "transport.tx.size",[{"min":0,"max":0,"name":"transport.tx.size","type":0}],{"plugin":"ElasticSearch","time":1341655799.77979,"type":"transport.tx.size","values":[9725948078],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}
+    my @values;
+    foreach my $val (@{ $data->{values} }) {
+        my $meta = shift(@$types);
+        $meta->{value} = $val;
+        push(@values, $meta);
+    }
+    $data->{values} = \@values;
     my $output = _output() || return 0;
-    $output->consume($val);
+    $output->consume($data);
     return 1;
 }
 
@@ -133,7 +140,52 @@ Collectd::Plugin::Write::Message::Passing - Write collectd metrics via Message::
 
     Will emit metrics like this:
 
-    [{"min":0,"max":100,"name":"shortterm","type":1},{"min":0,"max":100,"name":"midterm","type":1},{"min":0,"max":100,"name":"longterm","type":1}],{"plugin":"load","time":1341655869.22588,"type":"load","values":[0.41,0.13,0.08],"interval":10,"host":"t0m.local"}]
+    {
+        "plugin":"ElasticSearch",
+        "time":1341656031.18621,
+        "values":[
+            {
+                "value":0,
+                "min":0,
+                "name":"indices.get.time",
+                "max":0,
+                "type":0
+            }
+        ],
+        "type":"indices.get.time",
+        "interval":10,
+        "host":"t0m.local"
+    }
+
+    or, for multi-value metrics:
+
+    {
+        "plugin":"load",
+        "time":1341655869.22588,
+        "type":"load",
+        "values":[
+            {
+                "value":0.41,
+                "min":0,"max":100,"name":"shortterm","type":1
+            },
+            {
+                "value":0.13,
+                "min":0,
+                "max":100,
+                "name": "midterm",
+                "type":1
+            },
+            {
+                "value":0.08
+                "min":0,
+                "max":100,
+                "name":"longterm",
+                "type":1
+            }
+        ],
+        "interval":10,
+        "host":"t0m.local"
+    }
 
 =head1 DESCRIPTION
 
