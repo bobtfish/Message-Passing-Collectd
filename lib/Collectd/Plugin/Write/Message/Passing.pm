@@ -34,7 +34,7 @@ sub _flatten_item {
 sub config {
     my @items = @{ $_[0]->{children} };
     foreach my $item (@items) {
-	%CONFIG = ( %{_flatten_item($item)} , %CONFIG );
+        %CONFIG = ( %{_flatten_item($item)} , %CONFIG );
     }
 }
 
