@@ -10,7 +10,12 @@ all_from 'lib/Message/Passing/Collectd.pm';
 license 'AGPL_3';
 authority 'GHENRY';
 
+requires 'Collectd';
 requires 'JSON';
+requires 'Try::Tiny';
+requires 'String::RewritePrefix';
+requires 'Module::Runtime';
+requires 'namespace::clean';
 
 author_requires 'Test::Pod' => '1.14';
 author_requires 'Test::NoTabs';
