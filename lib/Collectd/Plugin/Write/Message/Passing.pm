@@ -120,14 +120,14 @@ Collectd::Plugin::Write::Message::Passing - Write collectd metrics via Message::
         <Plugin "Write::Message::Passing">
             # MANDATORY - You MUST configure an output class
             OutputClass "ZeroMQ"
-            <OutputClassOptions>
+            <OutputOptions>
                 connect "tcp://192.168.0.1:5552"
-            </OutputClassOptions>
+            </OutputOptions>
             # OPTIONAL - Defaults to JSON
             #EncoderClass "JSON"
-            #<EncoderClassOptions>
+            #<EncoderOptions>
             #   pretty "0"
-            #</EncoderClassOptions>
+            #</EncoderOptions>
         </Plugin>
     </Plugin>
 
