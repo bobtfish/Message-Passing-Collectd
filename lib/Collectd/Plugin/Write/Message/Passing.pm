@@ -105,3 +105,31 @@ Collectd::plugin_register(
 
 1;
 
+=head1 NAME
+
+Collectd::Plugin::Write::Message::Passing - Write collectd metrics via Message::Passing
+
+=head1 SYNOPSIS
+
+    <LoadPlugin perl>
+        Globals true
+    </LoadPlugin>
+    <Plugin perl>
+        BaseName "Collectd::Plugin"
+        LoadPlugin "Write::Message::Passing"
+        <Plugin "Write::Message::Passing">
+            # MANDATORY - You MUST configure an output class
+            OutputClass "ZeroMQ"
+            <OutputClassOptions>
+                connect "tcp://192.168.0.1:5552"
+            </OutputClassOptions>
+            # OPTIONAL - Defaults to JSON
+            #EncoderClass "JSON"
+            #<EncoderClassOptions>
+            #   pretty "0"
+            #</EncoderClassOptions>
+        </Plugin>
+    </Plugin>
+
+=cut
+

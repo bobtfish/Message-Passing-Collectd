@@ -10,7 +10,6 @@ all_from 'lib/Message/Passing/Collectd.pm';
 license 'AGPL_3';
 authority 'GHENRY';
 
-requires 'Collectd';
 requires 'JSON';
 requires 'Try::Tiny';
 requires 'String::RewritePrefix';
