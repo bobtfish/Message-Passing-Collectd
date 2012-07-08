@@ -12,13 +12,30 @@ use namespace::clean;
 our $OUTPUT;
 our %CONFIG;
 
+sub _clean_value {
+    my $val = shift;
+    scalar(@$val) > 1 ? $val : $val->[0];
+}
+
+sub _flatten_item {
+    my $item = shift;
+    my $val;
+    if (scalar(@{$item->{children}})) {
+        $val = [ map { my $i = $_; _flatten_item($i) } @{$item->{children}} ];
+    }
+    else {
+        $val = $item->{values};
+    }
+    return {
+        $item->{key} => _clean_value($val)
+    }
+}
+
 sub config {
-    # {
-   # key      => key,
-   # values   => [ val1, val2, ... ],
-   # children => [ { ... }, { ... }, ... ]
-   #}
-    %CONFIG = map { $_->{key} => (scalar(@{$_->{values}}) > 1 ? $_->{values} : $_->{values}->[0]) } @{ $_[0]->{children} };
+    my @items = @{ $_[0]->{children} };
+    foreach my $item (@items) {
+	%CONFIG = ( %{_flatten_item($item)} , %CONFIG );
+    }
 }
 
 sub _output {
@@ -58,6 +75,10 @@ sub init {
         { '' => 'Message::Passing::Filter::Encoder::', '+' => '' },
         $CONFIG{EncoderClass}
     );
+    if (!eval { require_module($CONFIG{EncoderClass}) }) {
+        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load EncoderClass=" . $CONFIG{EncoderClass} . " error: $@");
+        return 0;
+    }
     $CONFIG{OutputOptions} ||= {};
     $CONFIG{EncoderOptions} ||= {};
     return 1;
@@ -67,19 +88,19 @@ sub write {
     my ($name, $val) = @_;
     # ["load",[{"min":0,"max":100,"name":"shortterm","type":1},{"min":0,"max":100,"name":"midterm","type":1},{"min":0,"max":100,"name":"longterm","type":1}],{"plugin":"load","time":1341655869.22588,"type":"load","values":[0.41,0.13,0.08],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}]
     # "transport.tx.size",[{"min":0,"max":0,"name":"transport.tx.size","type":0}],{"plugin":"ElasticSearch","time":1341655799.77979,"type":"transport.tx.size","values":[9725948078],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}
-    my $output = _output() || return undef;
+    my $output = _output() || return 1;
     $output->consume($val);
     return 1;
 }
 
 Collectd::plugin_register(
-    Collectd::TYPE_INIT, 'Message::Passing', 'Collectd::Plugin::Write::Message::Passing::init'
+    Collectd::TYPE_INIT, 'Write::Message::Passing', 'Collectd::Plugin::Write::Message::Passing::init'
 );
 Collectd::plugin_register(
-    Collectd::TYPE_CONFIG, 'Message::Passing', 'Collectd::Plugin::Write::Message::Passing::config'
+    Collectd::TYPE_CONFIG, 'Write::Message::Passing', 'Collectd::Plugin::Write::Message::Passing::config'
 );
 Collectd::plugin_register(
-    Collectd::TYPE_WRITE, 'Message::Passing', 'Collectd::Plugin::Write::Message::Passing::write'
+    Collectd::TYPE_WRITE, 'Write::Message::Passing', 'Collectd::Plugin::Write::Message::Passing::write'
 );
 
 1;
