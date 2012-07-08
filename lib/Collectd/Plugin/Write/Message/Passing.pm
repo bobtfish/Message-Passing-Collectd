@@ -84,6 +84,10 @@ sub init {
     return 1;
 }
 
+my %_TYPE_LOOKUP = (
+    0 => 'COUNTER',
+    1 => 'GAUGE',
+);
 sub write {
     my ($name, $types, $data) = @_;
     # ["load",[{"min":0,"max":100,"name":"shortterm","type":1},{"min":0,"max":100,"name":"midterm","type":1},{"min":0,"max":100,"name":"longterm","type":1}],{"plugin":"load","time":1341655869.22588,"type":"load","values":[0.41,0.13,0.08],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}]
@@ -93,6 +97,7 @@ sub write {
         my $meta = shift(@$types);
         $meta->{value} = $val;
         push(@values, $meta);
+        $meta->{type} = $_TYPE_LOOKUP{$meta->{type}} || $meta->{type};
     }
     $data->{values} = \@values;
     my $output = _output() || return 0;

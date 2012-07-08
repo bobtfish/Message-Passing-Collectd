@@ -50,7 +50,7 @@ my $exp_one = q{{
                 "min":0,
                 "name":"indices.get.time",
                 "max":0,
-                "type":0
+                "type":"COUNTER"
             }
         ],
         "type":"indices.get.time",
@@ -77,21 +77,21 @@ my $exp_multi = q{{
                 "min":0,
                 "max":100,
                 "name":"shortterm",
-                "type":1
+                "type":"GAUGE"
             },
             {
                 "value":0.13,
                 "min":0,
                 "max":100,
                 "name": "midterm",
-                "type":1
+                "type":"GAUGE"
             },
             {
                 "value":0.08,
                 "min":0,
                 "max":100,
                 "name":"longterm",
-                "type":1
+                "type":"GAUGE"
             }
         ],
         "interval":10,
