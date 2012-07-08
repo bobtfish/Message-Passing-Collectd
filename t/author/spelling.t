@@ -4,6 +4,14 @@ use Test::More;
 use Test::Spelling;
 
 add_stopwords(qw(
+    adaptors
+    EncoderClass
+    EncoderOptions
+    OutputClass
+    OutputOptions
+    collectd
+    init
+    munges
     SureVoIP
     VoIP
     Starman

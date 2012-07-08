@@ -7,7 +7,7 @@ use Module::Install::Authority;
 
 all_from 'lib/Message/Passing/Collectd.pm';
 
-license 'AGPL_3';
+license 'perl';
 authority 'GHENRY';
 
 requires 'JSON';
@@ -15,6 +15,7 @@ requires 'Try::Tiny';
 requires 'String::RewritePrefix';
 requires 'Module::Runtime';
 requires 'namespace::clean';
+test_requires 'Test::More' => '0.88';
 
 author_requires 'Test::Pod' => '1.14';
 author_requires 'Test::NoTabs';

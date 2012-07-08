@@ -2,7 +2,6 @@ package Collectd::Plugin::Write::Message::Passing;
 use strict;
 use warnings;
 use Collectd ();
-use Data::Dumper;
 use JSON;
 use Module::Runtime qw/ require_module /;
 use String::RewritePrefix ();
@@ -81,6 +80,7 @@ sub init {
     }
     $CONFIG{OutputOptions} ||= {};
     $CONFIG{EncoderOptions} ||= {};
+    _output() || return 0;
     return 1;
 }
 
@@ -88,7 +88,7 @@ sub write {
     my ($name, $val) = @_;
     # ["load",[{"min":0,"max":100,"name":"shortterm","type":1},{"min":0,"max":100,"name":"midterm","type":1},{"min":0,"max":100,"name":"longterm","type":1}],{"plugin":"load","time":1341655869.22588,"type":"load","values":[0.41,0.13,0.08],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}]
     # "transport.tx.size",[{"min":0,"max":0,"name":"transport.tx.size","type":0}],{"plugin":"ElasticSearch","time":1341655799.77979,"type":"transport.tx.size","values":[9725948078],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}
-    my $output = _output() || return 1;
+    my $output = _output() || return 0;
     $output->consume($val);
     return 1;
 }
@@ -130,6 +130,57 @@ Collectd::Plugin::Write::Message::Passing - Write collectd metrics via Message::
             #</EncoderClassOptions>
         </Plugin>
     </Plugin>
+
+    Will emit metrics like this:
+
+    [{"min":0,"max":100,"name":"shortterm","type":1},{"min":0,"max":100,"name":"midterm","type":1},{"min":0,"max":100,"name":"longterm","type":1}],{"plugin":"load","time":1341655869.22588,"type":"load","values":[0.41,0.13,0.08],"interval":10,"host":"t0m.local"}]
+
+=head1 DESCRIPTION
+
+A collectd plugin to emit metrics from L<collectd|http://collectd.org/> into L<Message::Passing>.
+
+=head1 PACKAGE VARIABLES
+
+=head2 %CONFIG
+
+A hash containing the following:
+
+=head3 OutputClass
+
+The name of the class which will act as the Message::Passing output. Will be used as-is if prefixed with C<+>,
+otherwise C<Message::Passing::Output::> will be prepended. Required.
+
+=head3 OutputOptions
+
+The hash of options for the output class. Not required, but almost certainly needed.
+
+=head3 EncoderClass
+
+The name of the class which will act  the Message::Passing encoder. Will be used as-is if prefixed with C<+>,
+otherwise C<Message::Passing::Output::> will be prepended. Optional, defaults to L<JSON|Message::Passing::Filter::Encoder::JSON>.
+
+=head3 EncoderOptions
+
+The hash of options for the encoder class.
+
+=head1 FUNCTIONS
+
+=head2 config
+
+Called first with configuration in the config file, munges it into the format expected
+and places it into the C<%CONFIG> hash.
+
+=head2 init
+
+Validates the config, and initializes the C<$OUTPUT>
+
+=head2 write
+
+Writes a metric to the output in C<$OUTPUT>.
+
+=head1 AUTHOR, COPYRIGHT & LICENSE
+
+See L<Message::Passing::Collectd>.
 
 =cut
 

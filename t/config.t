@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+no warnings 'once';
 
 use FindBin qw/ $Bin /;
 use lib "$Bin/lib";
