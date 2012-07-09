@@ -64,12 +64,12 @@ sub _input {
             my $out = Message::Passing::Output::Callback->new(
                 cb => \&_do_message_passing_read,
             );
-            my $decoder = $CONFIG{DecoderClass}->new(
-                %{ $CONFIG{DecoderOptions} },
+            my $decoder = $CONFIG{decoderclass}->new(
+                %{ $CONFIG{decoderoptions} },
                 output_to => $out,
             );
-            $INPUT = $CONFIG{InputClass}->new(
-                %{ $CONFIG{InputOptions} },
+            $INPUT = $CONFIG{inputclass}->new(
+                %{ $CONFIG{inputoptions} },
                 output_to => $decoder,
             );
         }
@@ -82,30 +82,30 @@ sub _input {
 }
 
 sub init {
-    if (!$CONFIG{InputClass}) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "No InputClass config for Message::Passing plugin - disabling");
+    if (!$CONFIG{inputclass}) {
+        Collectd::plugin_log(Collectd::LOG_WARNING, "No inputclass config for Message::Passing plugin - disabling");
         return 0;
     }
-    $CONFIG{InputClass} = String::RewritePrefix->rewrite(
+    $CONFIG{inputclass} = String::RewritePrefix->rewrite(
         { '' => 'Message::Passing::Input::', '+' => '' },
-        $CONFIG{InputClass}
+        $CONFIG{inputclass}
     );
-    if (!eval { require_module($CONFIG{InputClass}) }) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load InputClass=" . $CONFIG{InputClass} . " error: $@");
+    if (!eval { require_module($CONFIG{inputclass}) }) {
+        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load inputclass=" . $CONFIG{InputClass} . " error: $@");
         return 0;
     }
-    $CONFIG{DecoderClass} ||= '+Message::Passing::Filter::Decoder::JSON';
-    $CONFIG{DecoderClass} = String::RewritePrefix->rewrite(
+    $CONFIG{decoderclass} ||= '+Message::Passing::Filter::Decoder::JSON';
+    $CONFIG{decoderclass} = String::RewritePrefix->rewrite(
         { '' => 'Message::Passing::Filter::Decoder::', '+' => '' },
-        $CONFIG{DecoderClass}
+        $CONFIG{decoderclass}
     );
-    if (!eval { require_module($CONFIG{DecoderClass}) }) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load DecoderClass=" . $CONFIG{DecoderClass} . " error: $@");
+    if (!eval { require_module($CONFIG{decoderclass}) }) {
+        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load decoderclass=" . $CONFIG{DecoderClass} . " error: $@");
         return 0;
     }
-    $CONFIG{InputOptions} ||= {};
-    $CONFIG{DecoderOptions} ||= {};
-    $CONFIG{ReadTimeSlice} = 0.25;
+    $CONFIG{inputoptions} ||= {};
+    $CONFIG{decoderoptions} ||= {};
+    $CONFIG{readtimeslice} = 0.25;
     _input() || return 0;
     return 1;
 }
@@ -118,7 +118,7 @@ my %_TYPE_LOOKUP = (
 sub read {
     my $cv = AnyEvent->condvar;
     my $t = AnyEvent->timer(
-        after => $CONFIG{ReadTimeSlice},
+        after => $CONFIG{readtimeslice},
         cb => sub { $cv->send },
     );
     $cv->recv;
@@ -153,14 +153,14 @@ Collectd::Plugin::Read::Message::Passing - Write collectd metrics via Message::P
         LoadPlugin "Read::Message::Passing"
         <Plugin "Read::Message::Passing">
             # MANDATORY - You MUST configure an output class
-            InputClass "ZeroMQ"
+            inputclass "ZeroMQ"
             <OutputOptions>
                 connect "tcp://192.168.0.1:5552"
             </OutputOptions>
             # OPTIONAL - Defaults to JSON
-            #DecoderClass "JSON"
-            #<DecoderOptions>
-            #</DecoderOptions>
+            #decoderclass "JSON"
+            #<decoderoptions>
+            #</decoderoptions>
         </Plugin>
     </Plugin>
 
@@ -225,25 +225,25 @@ B<WARNING:> This plugin is pre-alpha, and collectd causes blocking - may only wo
 
 A hash containing the following:
 
-=head3 InputClass
+=head3 inputclass
 
 The name of the class which will act as the Message::Passing output. Will be used as-is if prefixed with C<+>,
 otherwise C<Message::Passing::Input::> will be prepended. Required.
 
-=head3 InputOptions
+=head3 inputoptions
 
 The hash of options for the input class. Not required, but almost certainly needed.
 
-=head3 DecoderClass
+=head3 decoderclass
 
 The name of the class which will act  the Message::Passing decoder. Will be used as-is if prefixed with C<+>,
 otherwise C<Message::Passing::Filter::Decoder::> will be prepended. Optional, defaults to L<JSON|Message::Passing::Filter::Decoder::JSON>.
 
-=head3 DecoderOptions
+=head3 decoderoptions
 
 The hash of options for the decoder class.
 
-=head3 ReadTimeSlice
+=head3 readtimeslice
 
 The amount of time to block in Message::Passing's read loop. Defaults to 0.25 seconds, which could
 not be enough if you are consuming a lot of metrics..

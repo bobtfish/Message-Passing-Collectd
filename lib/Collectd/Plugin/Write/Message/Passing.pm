@@ -40,11 +40,11 @@ sub config {
 sub _output {
     if (!$OUTPUT) {
         try {
-            my $out = $CONFIG{OutputClass}->new(
-                %{ $CONFIG{OutputOptions} }
+            my $out = $CONFIG{outputclass}->new(
+                %{ $CONFIG{outputoptions} }
             );
-            $OUTPUT = $CONFIG{EncoderClass}->new(
-                %{ $CONFIG{EncoderOptions} },
+            $OUTPUT = $CONFIG{encoderclass}->new(
+                %{ $CONFIG{encoderoptions} },
                 output_to => $out,
             );
         }
@@ -57,29 +57,29 @@ sub _output {
 }
 
 sub init {
-    if (!$CONFIG{OutputClass}) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "No OutputClass config for Message::Passing plugin - disabling");
+    if (!$CONFIG{outputclass}) {
+        Collectd::plugin_log(Collectd::LOG_WARNING, "No outputclass config for Message::Passing plugin - disabling");
         return 0;
     }
-    $CONFIG{OutputClass} = String::RewritePrefix->rewrite(
+    $CONFIG{outputclass} = String::RewritePrefix->rewrite(
         { '' => 'Message::Passing::Output::', '+' => '' },
-        $CONFIG{OutputClass}
+        $CONFIG{outputclass}
     );
-    if (!eval { require_module($CONFIG{OutputClass}) }) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load OutputClass=" . $CONFIG{OutputClass} . " error: $@");
+    if (!eval { require_module($CONFIG{outputclass}) }) {
+        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load outputclass=" . $CONFIG{OutputClass} . " error: $@");
         return 0;
     }
-    $CONFIG{EncoderClass} ||= '+Message::Passing::Filter::Encoder::JSON';
-    $CONFIG{EncoderClass} = String::RewritePrefix->rewrite(
+    $CONFIG{encoderclass} ||= '+Message::Passing::Filter::Encoder::JSON';
+    $CONFIG{encoderclass} = String::RewritePrefix->rewrite(
         { '' => 'Message::Passing::Filter::Encoder::', '+' => '' },
-        $CONFIG{EncoderClass}
+        $CONFIG{encoderclass}
     );
-    if (!eval { require_module($CONFIG{EncoderClass}) }) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load EncoderClass=" . $CONFIG{EncoderClass} . " error: $@");
+    if (!eval { require_module($CONFIG{encoderclass}) }) {
+        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load encoderclass=" . $CONFIG{EncoderClass} . " error: $@");
         return 0;
     }
-    $CONFIG{OutputOptions} ||= {};
-    $CONFIG{EncoderOptions} ||= {};
+    $CONFIG{outputoptions} ||= {};
+    $CONFIG{encoderoptions} ||= {};
     _output() || return 0;
     return 1;
 }
@@ -131,15 +131,15 @@ Collectd::Plugin::Write::Message::Passing - Write collectd metrics via Message::
         LoadPlugin "Write::Message::Passing"
         <Plugin "Write::Message::Passing">
             # MANDATORY - You MUST configure an output class
-            OutputClass "ZeroMQ"
-            <OutputOptions>
+            outputclass "ZeroMQ"
+            <outputoptions>
                 connect "tcp://192.168.0.1:5552"
-            </OutputOptions>
+            </outputoptions>
             # OPTIONAL - Defaults to JSON
-            #EncoderClass "JSON"
-            #<EncoderOptions>
+            #encoderclass "JSON"
+            #<encoderoptions>
             #   pretty "0"
-            #</EncoderOptions>
+            #</encoderoptions>
         </Plugin>
     </Plugin>
 
@@ -202,21 +202,21 @@ A collectd plugin to emit metrics from L<collectd|http://collectd.org/> into L<M
 
 A hash containing the following:
 
-=head3 OutputClass
+=head3 outputclass
 
 The name of the class which will act as the Message::Passing output. Will be used as-is if prefixed with C<+>,
 otherwise C<Message::Passing::Output::> will be prepended. Required.
 
-=head3 OutputOptions
+=head3 outputoptions
 
 The hash of options for the output class. Not required, but almost certainly needed.
 
-=head3 EncoderClass
+=head3 encoderclass
 
 The name of the class which will act  the Message::Passing encoder. Will be used as-is if prefixed with C<+>,
 otherwise C<Message::Passing::Filter::Encoder::> will be prepended. Optional, defaults to L<JSON|Message::Passing::Filter::Encoder::JSON>.
 
-=head3 EncoderOptions
+=head3 encoderoptions
 
 The hash of options for the encoder class.
 
