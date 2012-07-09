@@ -16,5 +16,7 @@ use constant LOG_WARNING => 'WARNING';
 
 sub plugin_register {}
 
+sub plugin_log { warn @_ }
+
 1;
 

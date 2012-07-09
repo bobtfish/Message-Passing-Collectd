@@ -5,17 +5,17 @@ use Test::Spelling;
 
 add_stopwords(qw(
     AnyEvent
-    DecoderClass
-    DecoderOptions
-    InputClass
-    InputOptions
-    ReadTimeSlice
+    decoderclass
+    decoderoptions
+    inputclass
+    inputoptions
+    readtimeslice
     pre
     adaptors
-    EncoderClass
-    EncoderOptions
-    OutputClass
-    OutputOptions
+    encoderclass
+    encoderoptions
+    outputclass
+    outputoptions
     collectd
     init
     munges
