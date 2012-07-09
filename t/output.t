@@ -13,10 +13,10 @@ use_ok 'Collectd::Plugin::Write::Message::Passing';
 
 open(my $fh, '<', "$Bin/example_data.json") or die $!;
 
-$Collectd::Plugin::Write::Message::Passing::CONFIG{EncoderClass} = 'Message::Passing::Filter::Encoder::JSON';
-$Collectd::Plugin::Write::Message::Passing::CONFIG{OutputClass} = 'Message::Passing::Output::Test';
-$Collectd::Plugin::Write::Message::Passing::CONFIG{EncoderOptions} = {};
-$Collectd::Plugin::Write::Message::Passing::CONFIG{OutputOptions} = {};
+$Collectd::Plugin::Write::Message::Passing::CONFIG{encoderclass} = 'Message::Passing::Filter::Encoder::JSON';
+$Collectd::Plugin::Write::Message::Passing::CONFIG{outputclass} = 'Message::Passing::Output::Test';
+$Collectd::Plugin::Write::Message::Passing::CONFIG{encoderoptions} = {};
+$Collectd::Plugin::Write::Message::Passing::CONFIG{outputoptions} = {};
 
 my $count = 0;
 my $last_line;
