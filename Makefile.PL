@@ -27,6 +27,10 @@ author_requires 'Test::Spelling';
 
 author_tests 't/author';
 
+resources(
+    repository => 'git://github.com/suretec/Message-Passing-Collectd.git',
+);
+
 if ($Module::Install::AUTHOR) {
     system("pod2text lib/Message/Passing/Collectd.pm > README")
         and die $!;
