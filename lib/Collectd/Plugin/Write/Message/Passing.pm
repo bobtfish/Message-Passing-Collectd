@@ -171,21 +171,24 @@ Collectd::Plugin::Write::Message::Passing - Write collectd metrics via Message::
         "values":[
             {
                 "value":0.41,
-                "min":0,"max":100,"name":"shortterm","type":1
+                "min":0,
+                "max":100,
+                "name":"shortterm",
+                "type":"GAUGE"
             },
             {
                 "value":0.13,
                 "min":0,
                 "max":100,
-                "name": "midterm",
-                "type":1
+                "name":"midterm",
+                "type":"GAUGE"
             },
             {
                 "value":0.08
                 "min":0,
                 "max":100,
                 "name":"longterm",
-                "type":1
+                "type":"GAUGE"
             }
         ],
         "interval":10,
