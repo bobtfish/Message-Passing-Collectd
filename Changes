@@ -1,3 +1,6 @@
+  - Add repository metadata
+
+0.004
   - Change all config keys to lower case, as puppet doesn't
     seem to like upper case keys in hashes.
 
