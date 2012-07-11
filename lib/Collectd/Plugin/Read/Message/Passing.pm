@@ -128,20 +128,20 @@ sub read {
 }
 
 Collectd::plugin_register(
-    Collectd::TYPE_INIT, 'Read::Message::Passing', 'Collectd::Plugin::Write::Message::Passing::init'
+    Collectd::TYPE_INIT, 'Read::Message::Passing', 'Collectd::Plugin::Read::Message::Passing::init'
 );
 Collectd::plugin_register(
-    Collectd::TYPE_CONFIG, 'Read::Message::Passing', 'Collectd::Plugin::Write::Message::Passing::config'
+    Collectd::TYPE_CONFIG, 'Read::Message::Passing', 'Collectd::Plugin::Read::Message::Passing::config'
 );
 Collectd::plugin_register(
-    Collectd::TYPE_READ, 'Read::Message::Passing', 'Collectd::Plugin::Write::Message::Passing::read'
+    Collectd::TYPE_READ, 'Read::Message::Passing', 'Collectd::Plugin::Read::Message::Passing::read'
 );
 
 1;
 
 =head1 NAME
 
-Collectd::Plugin::Read::Message::Passing - Write collectd metrics via Message::Passing
+Collectd::Plugin::Read::Message::Passing - Read collectd metrics via Message::Passing
 
 =head1 SYNOPSIS
 
@@ -154,9 +154,9 @@ Collectd::Plugin::Read::Message::Passing - Write collectd metrics via Message::P
         <Plugin "Read::Message::Passing">
             # MANDATORY - You MUST configure an output class
             inputclass "ZeroMQ"
-            <OutputOptions>
+            <inputoptions>
                 connect "tcp://192.168.0.1:5552"
-            </OutputOptions>
+            </inputoptions>
             # OPTIONAL - Defaults to JSON
             #decoderclass "JSON"
             #<decoderoptions>
