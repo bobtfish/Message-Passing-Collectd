@@ -8,6 +8,7 @@ use String::RewritePrefix ();
 use Try::Tiny;
 use Message::Passing::Output::Callback;
 use AnyEvent;
+use threads;
 use namespace::clean;
 
 our $INPUT;
@@ -39,9 +40,27 @@ sub config {
     }
 }
 
+my %_TYPE_LOOKUP = (
+    'COUNTER' => 0,
+    'GAUGE' => 1,
+);
+
 sub _do_message_passing_read {
     my $message = shift;
     Collectd::plugin_log(Collectd::LOG_WARNING, "Got message from Message::Passing " . JSON::encode_json($message));
+    my $vl = {
+        values => [ map { $_->{value} } @{$message->{values}} ],
+        plugin => $message->{plugin},
+        type => $_TYPE_LOOKUP{$message->{values}->[0]->{type}},
+    };
+    $vl = {
+        values => [ map { $_->{value} } @{$message->{values}} ],
+        plugin => $message->{plugin},
+        type => $message->{type},
+        $message->{plugin_instance} ? (plugin_instance => $message->{plugin_instance}) : (),
+    };
+    Collectd::plugin_log(Collectd::LOG_WARNING, "Got message for collectd " . JSON::encode_json($vl));
+    Collectd::plugin_dispatch_values($vl);
 }
 
 # ["load",[{"min":0,"max":100,"name":"shortterm","type":1},{"min":0,"max":100,"name":"midterm","type":1},{"min":0,"max":100,"name":"longterm","type":1}],{"plugin":"load","time":1341655869.22588,"type":"load","values":[0.41,0.13,0.08],"interval":10,"host":"ldn-dev-tdoran.youdevise.com"}]
@@ -74,16 +93,16 @@ sub _input {
             );
         }
         catch {
-            Collectd::plugin_log(Collectd::LOG_WARNING, "Got exception building inputs: $_ - DISABLING");
+            Collectd::plugin_log(Collectd::LOG_WARNING, "Got exception building inputs: $_ - DISABLING thread id " . threads->tid);
             undef $INPUT;
-        }
+        };
     }
     return $INPUT;
 }
 
 sub init {
     if (!$CONFIG{inputclass}) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "No inputclass config for Message::Passing plugin - disabling");
+        Collectd::plugin_log(Collectd::LOG_WARNING, "No inputclass config for Message::Passing plugin - disabling PID $$ TID " . threads->tid);
         return 0;
     }
     $CONFIG{inputclass} = String::RewritePrefix->rewrite(
@@ -100,22 +119,17 @@ sub init {
         $CONFIG{decoderclass}
     );
     if (!eval { require_module($CONFIG{decoderclass}) }) {
-        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load decoderclass=" . $CONFIG{DecoderClass} . " error: $@");
+        Collectd::plugin_log(Collectd::LOG_WARNING, "Could not load decoderclass=" . $CONFIG{decoderclass} . " error: $@");
         return 0;
     }
     $CONFIG{inputoptions} ||= {};
     $CONFIG{decoderoptions} ||= {};
     $CONFIG{readtimeslice} = 0.25;
-    _input() || return 0;
     return 1;
 }
 
-my %_TYPE_LOOKUP = (
-    'COUNTER' => 0,
-    'GAUGE' => 1,
-);
-
 sub read {
+    _input();
     my $cv = AnyEvent->condvar;
     my $t = AnyEvent->timer(
         after => $CONFIG{readtimeslice},
